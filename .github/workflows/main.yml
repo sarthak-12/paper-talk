@@ -1,0 +1,32 @@
+name: Build and Push Docker Image
+
+# This tells GitHub to run the workflow on every push to the "main" branch
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build-and-push:
+    # Use a standard Ubuntu Linux virtual machine to run the job
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Download your code from the repository into the runner
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # 2. Log in to Docker Hub using the secrets we stored
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      # 3. Build the Docker image and push it to your Docker Hub account
+      - name: Build and Push to Docker Hub
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          # This creates a tag like "yourusername/paper-talk:latest"
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/paper-talk:latest
